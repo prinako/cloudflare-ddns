@@ -7,9 +7,6 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     ".github": true,
-    ".gitignore": true,
-    ".vscode": true,
-    "Dockerfile": true,
     "LICENSE": true,
     "requirements.txt": true,
     "venv": true
