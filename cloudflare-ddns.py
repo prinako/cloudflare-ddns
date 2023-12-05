@@ -194,7 +194,7 @@ def updateLoadBalancer(ip):
         if pools:
             name = option['origin']
             idxr = dict((p['id'], i) for i, p in enumerate(pools['result']))
-            idx = idxr.get(name)
+            idx = idxr.get(option['pool_id'])
 
             origins = pools['result'][idx]['origins']
 
