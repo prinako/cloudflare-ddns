@@ -187,26 +187,28 @@ def commitRecord(ip):
 
 
 def updateLoadBalancer(ip):
+    try:
+        for option in config["load_balancer"]:
+            pools = cf_api('user/load_balancers/pools', 'GET', option)
+            if pools:
+                name = option['origin']
+                idxr = dict((p['id'], i) for i, p in enumerate(pools['result']))
+                idx = idxr.get(option['pool_id'])
 
-    for option in config["load_balancer"]:
-        pools = cf_api('user/load_balancers/pools', 'GET', option)
+                origins = pools['result'][idx]['origins']
 
-        if pools:
-            name = option['origin']
-            idxr = dict((p['id'], i) for i, p in enumerate(pools['result']))
-            idx = idxr.get(option['pool_id'])
+                idxr = dict((o['name'], i) for i, o in enumerate(origins))
+                idx = idxr.get(option['origin'])
 
-            origins = pools['result'][idx]['origins']
+                if origins[idx]['address'] != ip['ip']:
+                    origins[idx]['address'] = ip['ip']
+                    data = {'origins': origins}
 
-            idxr = dict((o['name'], i) for i, o in enumerate(origins))
-            idx = idxr.get(option['origin'])
-
-            if origins[idx]['address'] != ip['ip']:
-                origins[idx]['address'] = ip['ip']
-                data = {'origins': origins}
-
-                print("📡 Updating LB Pool: " + name)
-                response = cf_api(f'user/load_balancers/pools/{option["pool_id"]}', 'PATCH', option, {}, data)
+                    print("📡 Updating LB Pool: " + name)
+                    response = cf_api(f'user/load_balancers/pools/{option["pool_id"]}', 'PATCH', option, {}, data)
+    except:
+        print("No load balancer section found")
+    
 
 
 def cf_api(endpoint, method, config, headers={}, data=False):
